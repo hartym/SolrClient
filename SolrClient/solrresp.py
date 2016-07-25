@@ -1,4 +1,6 @@
 import json
+from collections import OrderedDict
+
 from .exceptions import *
 
 class SolrResponse:
@@ -78,14 +80,14 @@ class SolrResponse:
             
         '''
         if not hasattr(self,'facets'):
-            self.facets = {}
+            self.facets = OrderedDict()
             data = self.data
             if 'facet_counts' in data.keys() and type(data['facet_counts']) == dict:
                 if 'facet_fields' in data['facet_counts'].keys() and type(data['facet_counts']['facet_fields']) == dict:
                     for facetfield in data['facet_counts']['facet_fields']:
                         if type(data['facet_counts']['facet_fields'][facetfield] == list):
                             l = data['facet_counts']['facet_fields'][facetfield]
-                            self.facets[facetfield] = dict(zip(l[::2],l[1::2]))
+                            self.facets[facetfield] = OrderedDict(zip(l[::2],l[1::2]))
                 return self.facets
             else:
                 raise SolrResponseError("No Facet Information in the Response")
@@ -273,7 +275,7 @@ class SolrResponse:
         if facets == -1:
             return facets
         if field in facets.keys():
-            return [x for x in facets[field]]
+            return facets[field].keys()
             
     def get_json(self):
         '''
